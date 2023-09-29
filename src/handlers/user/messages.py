@@ -57,4 +57,4 @@ class Messages:
 
     @staticmethod
     def get_before_start_photo() -> str:
-        return 'AgACAgIAAxkBAAEB_TtkzMl5s-HsM8JstC6FO4PRc4b6SAAC3cYxG5rOaErWm2hpoDD2pQEAAwIAA3kAAy8E'
+        return 'https://telegra.ph/file/a192368b9fa1a44cfd480.png'

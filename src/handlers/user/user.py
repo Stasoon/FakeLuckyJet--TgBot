@@ -4,7 +4,7 @@ from typing import Tuple, List, Union
 
 from aiogram import Dispatcher
 from aiogram.dispatcher import FSMContext
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, InputMedia
 
 from src.utils import send_typing_action, throttle
 from src.misc import UserDataInputting
@@ -78,45 +78,13 @@ async def __handle_locale_callback(callback: CallbackQuery):
 @throttle(rate=1.5)
 async def __handle_start_callback(callback: CallbackQuery, state: FSMContext):
     await send_typing_action(callback.message)
-    await callback.answer()
-    await callback.message.edit_caption(
+    await callback.message.delete()
+    await callback.message.answer_photo(
         caption=Messages.get_before_game_start(),
+        photo=Messages.get_before_start_photo(),
         reply_markup=Keyboards.get_first_signal_markup()
     )
 
-
-# async def __handle_user_password_message(message: Message, state: FSMContext):
-#     await send_typing_action(message)
-#     if message.text == CODE_WORD:
-#         await message.answer(Messages.ask_for_1win_id())
-#         await state.set_state(await UserDataInputting.next())
-#     else:
-#         await message.answer(Messages.get_code_word_incorrect())
-#
-#
-# async def __handle_user_id_message(message: Message, state: FSMContext):
-#     await send_typing_action(message)
-#
-#     if not message.text.isdigit():
-#         await message.answer(Messages.get_1win_id_incorrect_length())
-#         return
-#     if len(message.text) != 8:
-#         await message.answer(Messages.get_1win_id_have_forbidden_symbols())
-#         return
-#
-#     set_user_1win_id(message.from_user.id, message.text)
-#     if get_locale(message.from_user.id) == 'ru':
-#         await message.answer_photo(
-#             photo=Messages.get_before_start_photo(),
-#             caption=Messages.get_before_game_start(),
-#             reply_markup=Keyboards.get_first_signal_markup()
-#         )
-#     else:
-#         await message.answer(
-#             text=Messages.get_before_game_start(),
-#             reply_markup=Keyboards.get_first_signal_markup()
-#         )
-#     await state.finish()
 
 
 async def __handle_next_signal_callback(callback: CallbackQuery):
@@ -129,13 +97,13 @@ async def __handle_next_signal_callback(callback: CallbackQuery):
 
 
 async def __handle_change_coefficients_command(message: Message, state: FSMContext):
-    await message.answer('Введите новые коэффициенты через пробел: ')
+    await message.answer('✏ Введите новые коэффициенты через пробел: ')
     await state.set_state(await CoefficientsSetting.first())
 
 
 async def __handle_new_coefficients_message(message: Message, state: FSMContext):
     try:
-        coefficients = tuple(int(c) for c in message.text.strip().replace(',', ' ').split())
+        coefficients = tuple(c for c in message.text.strip().replace('\n', ' ').split())
     except ValueError:
         await message.answer('❗Один из коэффициентов, которые вы ввели, не является числом')
         await state.finish()
